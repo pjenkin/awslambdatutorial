@@ -15,7 +15,7 @@ exports.handler = async (event) => {
     let name = event.pathParameters.name;   // to get at query parameters in URL
     // NB policy JSON for Lambda test event template 'APIGatewayAWSProxy' ...
     // ... has attributes called queryStringParameters, and pathParameters
-    let {lang, ...info} = eventStringParameters; // NB 'lang' parameter (in URL querystring) & spread operator to assign others to 'info'
+    let {lang, ...info} = event.queryStringParameters; // NB 'lang' parameter (in URL querystring) & spread operator to assign others to 'info'
 
     let message = `${greeting[lang] ? greeting[lang] : greeting['en'] } ${name}`;
     // string-interpolate the url and the message
