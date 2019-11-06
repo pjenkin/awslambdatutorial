@@ -31,7 +31,7 @@ exports.handler = async (event, context) => {
     throw error;    // if using async/await
     console.error("Error occurred" + error.message);
     console.log("A log message");
-    console.info("An informative styling of message")
+    console.info("An informative styling of message");
     console.warn("Warning style of message!");
     // all of these are logged into AWS CloudWatch
 
