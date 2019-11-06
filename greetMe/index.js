@@ -1,56 +1,35 @@
-// 2-25 Lambda handler syntax (Nodejs 6 & 8)
-// Nodejs 6 without async/await
-// exports.handler = (event, context, callback) => {
-//     ...
-//     callback(null, result);
-// }
-
-// lambda handler using async/await with Promise - Nodejs 8 with async/await (no callback needed)
-// this pattern will be used a lot with AWS Lambda
-// event is the source of data
-// context eg function name, remaining time, memory allocation &c
-exports.handler = async (event, context) => {
-    
-    context.getRemainingTimeInMillis(); // 2-27 Context object properties & methods
-
-    context.functionName;   // sample function context properties
-    context.functionVersion;
-    context.functionArn;
-    context.awsRequestId;   
-    context.memoryLimitInMB;    // re function settings
-    context.identity; // Cognito /AWS mobile SDK
-    context.logGroupName;
-    context.logStreamName;
-    context.clientContext.client.app_title; // useful for AWS mobile SDK re user's device
-    context.clientContext.Custom;
-    context.clientContext.env.platform_version;
-    context.clientContext.env.model;
-
-    // 2-28 Logging and error handling
-    const error = new Error("An error occurred");
-    throw error;    // if using async/await
-    console.error("Error occurred" + error.message);
-    console.log("A log message");
-    console.info("An informative styling of message");
-    console.warn("Warning style of message!");
-    // all of these are logged into AWS CloudWatch
-
-
-    const data = event.data;
-    let newImage = await resizeImage();     // await Promise from resizeImage's lambda/arrow expression;  no need for .then()
-    return newImage;
-    //return result;
+const moment = require('moment');   // 2-30 Accessing path & query string parameters from the event object
+// 2-29 Passing parameters via the Event object
+const greeting =
+{
+    "en": "Hello",
+    "kr": "Dydh da",
+    "fr": "Bonjour",
+    "hi": "Namaste",
+    "bg": "Dobry den"
 }
 
-// write function that'll return a promise
-const resizeImage = (data) => new Promise((resolve, reject) =>
-{
+// now write the Lambda handler (where 'event' will give URL data)
+exports.handler = async (event) => {
+    // 2-30 Accessing path & query string parameters from the event object
+    let name = event.pathParameters.name;   // to get at query parameters in URL
+    // NB policy JSON for Lambda test event template 'APIGatewayAWSProxy' ...
+    // ... has attributes called queryStringParameters, and pathParameters
+    let {lang, ...info} = eventStringParameters; // NB 'lang' parameter (in URL querystring) & spread operator to assign others to 'info'
 
-    if (error)
-    {
-        reject(error);
-    } else
-    {
-        resolve(result);
+    let message = `${greeting[lang] ? greeting[lang] : greeting['en'] } ${name}`;
+    // string-interpolate the url and the message
+
+    // assemble a HTTP response body content object ready to return from this event
+    let response = {
+        message : message,
+        info: info, // anything else
+        timestamp: moment().unix() // have to npm init then npm install moment --save
     }
-});
+
+    // well-formed HTTP response object (status code and body) expected by Lambda
+    return {
+        statusCode: 200,
+        body: JSON.stringify(response)
+    }
+}
