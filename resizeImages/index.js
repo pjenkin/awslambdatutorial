@@ -11,7 +11,7 @@ const AWS = require('aws-sdk');
 // NB several conversions here, of returned library functions to await-able Promises
 const resizeAsync = promisify(im.resize);       // convert ImageMagick resize function into one which d'return a Promise
 const readFileASync = promisify(fs.readFile);  // ... likewise, instead of returned fs (filesystem) function, convert this to an await-able Promise
-const unlinkAsync = promisify(unlink);          // for use in un-linking the Lambda temp directory/file (to free up memory)
+const unlinkAsync = promisify(fs.unlink);          // for use in un-linking the Lambda temp directory/file (to free up memory)
 
 AWS.config.update({region: 'eu-west-2'});
 const s3 = new AWS.S3();
